@@ -5,4 +5,4 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - run: echo synthetic-tests-passed
+      - run: exit 1 # deliberate synthetic failure
