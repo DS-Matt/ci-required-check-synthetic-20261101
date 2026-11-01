@@ -12,7 +12,7 @@ jobs:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     steps:
-      - run: echo synthetic-tests-passed
+      - run: exit 1 # deliberate synthetic failure
   ci:
     name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'ci (metadata-only)' || 'ci' }}
     if: always()
