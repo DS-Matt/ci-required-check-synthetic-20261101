@@ -1,33 +1,8 @@
 name: Required check reproduction
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, edited]
-concurrency:
-  group: repro-${{ github.event.pull_request.number }}${{ github.event.action == 'edited' && github.event.changes.base == null && '-metadata' || '' }}
-  cancel-in-progress: ${{ github.event.action == 'synchronize' }}
+    types: [opened, synchronize, ready_for_review, reopened]
 jobs:
-  prerequisite:
-    if: github.event.action != 'edited' || github.event.changes.base != null
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo prerequisite
   ci:
-    name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'ci (metadata-only)' || 'ci' }}
-    if: github.event.action != 'edited' || github.event.changes.base != null
-    needs: prerequisite
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo success
-  ci_always:
-    name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'always (metadata-only)' || 'always' }}
-    if: always() && (github.event.action != 'edited' || github.event.changes.base != null)
-    needs: prerequisite
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo success
-  ci_no_needs:
-    name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'independent (metadata-only)' || 'independent' }}
-    if: github.event.action != 'edited' || github.event.changes.base != null
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo success
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/reusable-ci.yml

@@ -1,0 +1,8 @@
+name: Shared actual tests
+on:
+  workflow_call:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo synthetic-tests-passed
