@@ -1,0 +1,8 @@
+name: Base change verification
+on:
+  pull_request:
+    types: [edited]
+jobs:
+  ci:
+    if: github.event.changes.base != null && github.event.pull_request.draft == false
+    uses: ./.github/workflows/reusable-ci.yml
