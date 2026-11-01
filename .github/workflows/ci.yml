@@ -1,5 +1,7 @@
 name: Required check reproduction
 on:
+  push:
+    branches: [reproduce]
   pull_request:
     types: [opened, synchronize, ready_for_review, edited]
 concurrency:
