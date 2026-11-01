@@ -6,28 +6,24 @@ concurrency:
   group: repro-${{ github.event.pull_request.number }}${{ github.event.action == 'edited' && github.event.changes.base == null && '-metadata' || '' }}
   cancel-in-progress: ${{ github.event.action == 'synchronize' }}
 jobs:
-  prerequisite:
+  tests:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     steps:
-      - run: echo prerequisite
+      - run: echo synthetic-tests-passed
   ci:
     name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'ci (metadata-only)' || 'ci' }}
-    if: github.event.action != 'edited' || github.event.changes.base != null
-    needs: prerequisite
+    if: always()
+    needs: tests
     runs-on: ubuntu-latest
+    env:
+      METADATA_ONLY: ${{ github.event.action == 'edited' && github.event.changes.base == null }}
+      TEST_RESULT: ${{ needs.tests.result }}
     steps:
-      - run: echo success
-  ci_always:
-    name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'always (metadata-only)' || 'always' }}
-    if: always() && (github.event.action != 'edited' || github.event.changes.base != null)
-    needs: prerequisite
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo success
-  ci_no_needs:
-    name: ${{ github.event.action == 'edited' && github.event.changes.base == null && 'independent (metadata-only)' || 'independent' }}
-    if: github.event.action != 'edited' || github.event.changes.base != null
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo success
+      - name: Report actual test result only for real CI events
+        run: |
+          if [ "$METADATA_ONLY" = true ]; then
+            echo 'Metadata update; no test result asserted.'
+          else
+            test "$TEST_RESULT" = success
+          fi
